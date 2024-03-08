@@ -4,8 +4,75 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title>Lab 6</title>
+        <style>
+            .error {
+                color: red;
+            }
+            body {
+                background-color: white;
+            }
+        </style>
+         
     </head>
     <body>
-        Test.
+        <form id="emailForm">
+            <input id="emailAddress" name="emailAddress" type="email">
+            <input type="submit">
+            <span id="emailError" class="error"></span>
+        </form>
+
+        <script defer>
+            function validateEmail() {
+				let isValid = false;
+                const emailAddress = document.getElementById("emailAddress").value;
+                const errorMsg = document.getElementById("emailError");
+                errorMsg.textContent = "";
+                
+                if (emailAddress === "" || !emailAddress.endsWith("@siena.edu")) {
+                    errorMsg.textContent = "Please enter a valid email address";
+                } else {
+                    isValid = true;
+                    console.log("Email is valid: ", emailAddress);
+                    
+                }
+                
+                if(isValid){
+                    submitForm();
+                }
+            }
+
+            document.getElementById("emailForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                validateEmail();
+            })
+
+            function submitForm(){
+                let url = "https://macpro.csis410.com/submit"
+                
+                let params = new FormData();
+                params.append("email-address", document.getElementById("emailAddress").value);
+                fetch(url, { method: "POST", body: params })
+                    .then(statusCheck)
+                    .then((response) => response.text())
+                    .then((data) => onResponse(data))
+                    .catch(handleError);
+            }
+
+            function onResponse(data){
+                console.log("Response: "+data);
+            }
+
+            function handleError(error){
+                console.error(error);
+            }
+
+            async function statusCheck(res){
+                if(!res.ok){
+                    throw new Error(await res.text());
+                }
+                return res;
+            }
+
+        </script>  
     </body>
 </html>
